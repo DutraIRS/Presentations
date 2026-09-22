@@ -1,0 +1,834 @@
+\ifdefined\pdfvariable \pdfvariable minorversion=7 \else
+    \ifdefined\pdfminorversion \pdfminorversion=7 \fi
+\fi
+
+\documentclass[10pt,aspectratio=43]{beamer}
+
+\usetheme{Copenhagen}
+\usecolortheme{default}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm,bm}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{dsfont}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{tikz}
+
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{headline}{}
+\setbeamertemplate{page number in head/foot}[totalframenumber]
+
+\setbeamercolor{author in head/foot}{fg=white,bg=black}
+\setbeamercolor{title in head/foot}{fg=white,bg=structure.fg}
+
+\setbeamerfont{author in head/foot}{size=\scriptsize}
+\setbeamerfont{title in head/foot}{size=\scriptsize}
+
+\makeatletter
+\def\viva@progressdot#1/#2\relax{%
+    \begin{tikzpicture}[baseline=-0.5ex]
+        \path[use as bounding box] (0pt,-2pt) rectangle (5pt,2pt);
+        \ifnum\c@page<#1\relax
+            \draw[white!55!black,line width=0.4pt]
+            (2.5pt,0pt) circle[radius=1.4pt];
+        \else
+            \ifnum\c@page>#2\relax
+                \fill[white!70!black] (2.5pt,0pt) circle[radius=1.4pt];
+            \else
+                \fill[white] (2.5pt,0pt) circle[radius=1.9pt];
+            \fi
+        \fi
+    \end{tikzpicture}%
+}
+\newcommand{\vivasectiondots}{%
+    \ifbeamer@inappendix\else
+        \begingroup
+        \def\sectionentry##1##2##3##4##5{}%
+        \def\slideentry##1##2##3##4##5##6{%
+            \ifnum##6=\c@part\relax
+                \ifnum##1=\c@section\relax
+                    \ifnum##1>0\relax
+                        \beamer@link(##4){\viva@progressdot##4\relax}%
+                    \fi
+                \fi
+            \fi
+        }%
+        \dohead
+        \endgroup
+    \fi
+}
+\makeatother
+
+\setbeamertemplate{footline}{%
+    \leavevmode%
+    \hbox{%
+        \begin{beamercolorbox}[
+                wd=.28\paperwidth,ht=3.6ex,dp=1.8ex,center
+            ]{author in head/foot}%
+            \usebeamerfont{author in head/foot}\insertshortauthor
+        \end{beamercolorbox}%
+        \begin{beamercolorbox}[
+                wd=.72\paperwidth,ht=3.6ex,dp=1.8ex
+            ]{title in head/foot}%
+            \usebeamerfont{title in head/foot}%
+            \makebox[.20\paperwidth][c]{\insertshorttitle}%
+            \makebox[.16\paperwidth][c]{\insertsectionhead}%
+            \makebox[.28\paperwidth][c]{\vivasectiondots}%
+            \makebox[.08\paperwidth][c]{\insertframenumber/\inserttotalframenumber}%
+        \end{beamercolorbox}%
+    }%
+    \vskip0pt%
+}
+
+\usebeamercolor{structure}
+\colorlet{vivatag}{structure.fg}
+\newcommand{\ourstext}{Original contribution}
+
+\newif\ifvivaours
+\newcommand{\ours}{\global\vivaourstrue}
+
+\newsavebox{\vivatagbox}
+\newlength{\vivatagwidth}
+\newlength{\vivatagspace}
+\newlength{\vivatagdrop}
+\setlength{\vivatagdrop}{11.8pt}
+\AtBeginDocument{%
+    \savebox{\vivatagbox}{\small\bfseries\ourstext}%
+    \setlength{\vivatagwidth}{\dimexpr\wd\vivatagbox + 0.95cm\relax}%
+}
+\setbeamertemplate{frametitle}[default][left,rightskip=\vivatagspace]
+
+\addtobeamertemplate{frametitle}{%
+    \ifvivaours
+        \setlength{\vivatagspace}{\vivatagwidth}%
+    \else
+        \setlength{\vivatagspace}{0pt}%
+    \fi
+}{%
+    \ifvivaours
+        \begin{tikzpicture}[remember picture, overlay]
+            \path (0,0) -- (current page.north) coordinate[midway] (vivamid);
+            \node[anchor=east, xshift=-0.26cm, yshift=0.5\vivatagdrop, rounded corners=2pt,
+                fill=white, text=vivatag, inner xsep=5pt, inner ysep=2pt,
+                font=\small\bfseries]
+            at (current page.east |- vivamid) {\ourstext};
+        \end{tikzpicture}%
+        \vspace{-\vivatagdrop}%
+        \global\vivaoursfalse
+    \fi
+}
+
+\title[SelVAEGen]{Selective protein-targeted drug generation}
+\author{Iago Riveiro Santos Dutra}
+\date{}
+
+\begin{document}
+
+\begin{frame}[plain]
+    \titlepage
+    \vspace{-2.5cm}
+    \begin{center}
+        \small
+        Supervisor: Prof. Alberto Paccanaro
+
+        \vspace{0.5cm}
+        Escola de Matemática Aplicada
+
+        Fundação Getúlio Vargas
+    \end{center}
+
+    \vfill
+
+    \begin{center}
+        September 21\textsuperscript{st}, 2026
+    \end{center}
+
+    \vspace{-1cm}
+\end{frame}
+
+\section{Introduction}
+\begin{frame}{Introduction}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.8\textwidth]{figs/chapters/1.pdf}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Example}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{figs/barbie.png}
+    \end{figure}
+
+    \vfill
+    \centering
+    Melanotan-II tans you! No Sun involved!
+
+    \vfill
+\end{frame}
+
+\begin{frame}{Example}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=0.9\textwidth]{figs/comic.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Except...}
+    It was made for MC1R. It also binds to MC3R and MC4R.
+
+    \medskip
+    \begin{itemize}
+        \item Nausea, vomiting, loss of appetite
+        \item Priapism: painful erections lasting hours
+        \item New and darkening moles, and reported cases of melanoma
+    \end{itemize}
+
+    \vfill
+    \centering
+    \includegraphics[height=0.40\textheight]{figs/cancer.png}%
+    \hspace{0.8cm}%
+    \includegraphics[height=0.40\textheight]{figs/cancer2.png}
+    \vfill
+\end{frame}
+
+\section{Background}
+\newcommand{\pastage}[2]{%
+    \hangindent=1.5em
+    \hangafter=1
+    \textcolor{gray}{\textbf{#1}}\quad #2\par
+    \vspace{0.15em}
+}
+
+\newcommand{\stage}[2]{%
+    \hangindent=1.5em
+    \hangafter=1
+    \textbf{#1}\quad #2\par
+    \vspace{0.15em}
+}
+
+\begin{frame}{What has been done}
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.04\textwidth]{figs/lit_a.png}%
+    }
+
+    \vspace{0.6em}
+    \footnotesize\raggedright
+    \stage{Molecular generation}{[Kingma \& Welling, \emph{ICLR} 2014] \quad
+        \mbox{[G\'omez-Bombarelli \emph{et al.}, \emph{ACS Cent. Sci.} 2018]} \quad
+        [Brown \emph{et al.}, \emph{JCIM} 2019]}
+\end{frame}
+
+\begin{frame}{What has been done}
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.04\textwidth]{figs/lit_b.png}%
+    }
+
+    \vspace{0.6em}
+    \footnotesize\raggedright
+    \pastage{Molecular generation}{\textcolor{gray}{[Kingma \& Welling 2014] \quad
+            [G\'omez-Bombarelli \emph{et al.} 2018] \quad [Brown \emph{et al.} 2019]}}
+    \stage{Target-aware generation}{[Sohn \emph{et al.}, \emph{NeurIPS} 2015] \quad
+        \mbox{[Uludo\u gan \emph{et al.}, \emph{Bioinformatics} 2022]}\quad
+        [Chen \emph{et al.} 2023]}
+\end{frame}
+
+\begin{frame}{What has been done}
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.04\textwidth]{figs/lit_c.png}%
+    }
+
+    \vspace{0.6em}
+    \footnotesize\raggedright
+    \pastage{Molecular generation}{\textcolor{gray}{[Kingma \& Welling 2014] \quad
+            [G\'omez-Bombarelli \emph{et al.} 2018] \quad [Brown \emph{et al.} 2019]}}
+    \pastage{Target-aware generation}{\textcolor{gray}{[Sohn \emph{et al.} 2015] \quad
+            [Uludo\u gan \emph{et al.} 2022] \quad \mbox{[Chen \emph{et al.} 2023]}}}
+    \stage{On-target affinity optimization}{[Shah \emph{et al.} 2025 (DeepDTAGen)] \quad
+        \mbox{[Creanza \emph{et al.} 2025 (Prot2Drug)]} \quad
+        [Chen \emph{et al.} 2025 (ZeroGEN)]}
+\end{frame}
+
+\begin{frame}{What has been done}
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.04\textwidth]{figs/lit_d.png}%
+    }
+
+    \vspace{0.6em}
+    \footnotesize\raggedright
+    \pastage{Molecular generation}{\textcolor{gray}{[Kingma \& Welling 2014] \quad
+            [G\'omez-Bombarelli \emph{et al.} 2018] \quad [Brown \emph{et al.} 2019]}}
+    \pastage{Target-aware generation}{\textcolor{gray}{[Sohn \emph{et al.} 2015] \quad
+            [Uludo\u gan \emph{et al.} 2022] \quad \mbox{[Chen \emph{et al.} 2023]}}}
+    \pastage{On-target affinity optimization}{\textcolor{gray}{[Shah \emph{et al.} 2025] \quad
+            [Creanza \emph{et al.} 2025] \quad \mbox{[Chen \emph{et al.} 2025]}}}
+    \stage{Selectivity}{[Chenthamarakshan \emph{et al.} 2020 (CogMol)] \quad
+        [Gao \emph{et al.} 2024 ($\Delta$ score)] \quad [Zou \emph{et al.} 2025] \quad
+        [Koban \emph{et al.} 2026 (ConGen)] \quad [Qin \emph{et al.} 2026 (DBMol)]}
+\end{frame}
+
+\section{Metrics}
+\begin{frame}[t]{On notation}
+    We train a generator $G_\omega$
+
+    \medskip
+    \hspace*{1cm}\textbf{Input:} a target protein $p_i$
+
+    \medskip
+    \hspace*{1cm}\textbf{Output:} $K$ candidate drugs sampled independently:
+    \[
+    d_{i,1},\ldots,d_{i,K}
+    \overset{\mathrm{iid}}{\sim} G_\omega(\,\cdot\mid p_i)
+    \]
+
+    \vfill
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{figs/notation_generator.pdf}
+    \end{figure}
+
+    \vfill
+\end{frame}
+
+\begin{frame}[t]{On notation}
+    We train a generator model $G_\omega$
+
+    \medskip
+    We have a pre-trained ``oracle'' $f_\theta$
+
+    \medskip
+    \hspace*{1cm}\textbf{Input:} a drug-protein pair $(d_{i,k},\ p_j)$
+
+    \medskip
+    \hspace*{1cm}\textbf{Output:} their estimated binding affinity:
+
+    \medskip
+    \centering
+    $A_{i,k}^{(j)}=f_\theta(d_{i,k},\ p_j)$
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{figs/notation_oracle.pdf}
+    \end{figure}
+\end{frame}
+
+\begin{frame}[t]{On notation}
+    We train a generator model $G_\omega$
+
+    \medskip
+    We have a pre-trained ``oracle'' $f_\theta$
+
+    \medskip
+    We evaluate every drug against every protein
+
+    \medskip
+    \hspace*{1cm}$\mathcal{A}_{\mathrm{on}}=\left\{A_{i,k}^{(i)} \; \; \forall\ i,k \right\} \sim p_G$
+
+    \medskip
+    \hspace*{1cm}$\mathcal{A}_{\mathrm{off}}=\left\{A_{i,k}^{(j)} \; \; \forall \ i,j,k;\;j\neq i \right\} \sim q_G$
+
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{figs/notation_sets.pdf}
+    \end{figure}
+\end{frame}
+
+\begin{frame}[c]{Thresholds}
+    Each dataset has an affinity threshold.
+
+    \bigskip
+
+    \centering
+    \renewcommand{\arraystretch}{1.8}
+
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{
+                >{\color{black}}l
+                >{\color{black!20}}r
+                >{\color{black!20}}r
+                >{\color{black!20}}r
+                >{\color{black!20}}r
+                >{\color{black}}r
+                >{\color{black!20}}r
+            }
+            \toprule
+            \textbf{Dataset} &
+            \textbf{Drugs} &
+            \textbf{Proteins} &
+            \textbf{Records} &
+            \textbf{Density (\%)} &
+            \textbf{Threshold} &
+            \textbf{Positive (\%)} \\
+            \midrule
+
+            KIBA      & 2,015  & 225   & 115,822 & 25.55  & 12.10 & 20.86 \\
+            Davis     & 64     & 427   & 27,328  & 100.00 & 7.00  & 8.03  \\
+            BindingDB & 31,053 & 1,200 & 77,412  & 0.21   & 7.00  & 30.43 \\
+            Papyrus   & 81,147 & 749   & 239,226 & 0.39   & 7.00  & 32.15 \\
+
+            \bottomrule
+        \end{tabular}}
+
+\end{frame}
+
+\newcommand{\blindspot}[1]{%
+    \vfill
+    {\color{red!55!black}\textbf{Blind spot:} #1}
+    \vspace{0.3em}}
+
+\ours
+\begin{frame}[t]{Utility}
+    We start from a simple notion.
+
+    $$U(G_\omega, \tau) = \mathbb{P}_{p_G}(X \geq \tau) - \mathbb{P}_{q_G}(X \geq \tau)$$
+
+    \vfill
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.10\textwidth, trim=0bp 135bp 0bp 0bp, clip]
+        {figs/chapters/metrics.pdf}%
+    }
+\end{frame}
+
+\begin{frame}[t]{Delta score}
+    How much more a drug binds its own target than the rest.
+
+    $$\delta(d_{i,k}) = A_{i,k}^{(i)} - \frac{1}{N-1}\sum_{j \neq i} A_{i,k}^{(j)},
+    \qquad
+    \Delta = \frac{1}{NK}\sum_{i=1}^{N}\sum_{k=1}^{K}\delta(d_{i,k})$$
+
+    \vfill
+    \centering
+    \includegraphics[width=0.92\textwidth]{figs/talk/metric_delta.pdf}
+    \vfill
+
+    \raggedright
+    [Gao \emph{et al.} 2024 - Non-peer-reviewed arXiv preprint]
+\end{frame}
+
+\ours
+\begin{frame}[t]{Distributional delta}
+    Compare the whole distributions, not just their means.
+
+    $$\mathrm{Dist.}\,\Delta = \mathrm{sign}\!\left(\mathbb{E}[p_G] - \mathbb{E}[q_G]\right)\,
+    D_{\mathrm{KL}}\!\left(p_G \,\|\, q_G\right)$$
+
+    \vfill
+    \centering
+    \includegraphics[width=0.92\textwidth]{figs/talk/metric_distributional.pdf}
+    \vfill
+\end{frame}
+
+\ours
+\begin{frame}[t]{Effective delta}
+    Count only the drugs that matter.
+
+    $$S = \left\{\, d_{i,k} \;:\; \text{valid, unique, novel, and } A_{i,k}^{(i)} \geq \tau
+    \,\right\}$$
+
+    $$\mathrm{Eff.}\,\Delta = \frac{1}{NK}\sum_{i=1}^{N}\sum_{k=1}^{K}
+    \delta(d_{i,k}) \cdot \mathds{1}\!\left[d_{i,k} \in S\right]$$
+
+    \vfill
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.10\textwidth]{figs/talk/metric_effective.pdf}%
+    }
+    \vfill
+\end{frame}
+
+\ours
+\begin{frame}[t]{Directional consistency}
+    In what fraction of individual comparisons is the on-target affinity actually the
+    higher one?
+
+    $$m(i) = \frac{1}{K(N-1)}\sum_{k=1}^{K}\sum_{j \neq i}
+    \mathds{1}\!\left(A_{i,k}^{(i)} > A_{i,k}^{(j)}\right),
+    \qquad
+    \mathrm{Dir.Cons.} = \frac{1}{N}\sum_{i=1}^{N} m(i)$$
+
+    \vfill
+    \centering
+    \includegraphics[width=0.92\textwidth]{figs/talk/metric_directional.pdf}
+\end{frame}
+
+\ours
+\begin{frame}[t]{Tanimoto gap}
+    Does the protein actually change which molecules come out?
+
+    $$\mathrm{Gap} = \frac{1}{N}\sum_{i=1}^{N}
+    \big[\, \underbrace{g_{\mathrm{within}}(i)}_{\substack{\text{similarity between two}\\
+                \text{drugs made for } p_i}} \;-\;
+        \underbrace{g_{\mathrm{cross}}(i)}_{\substack{\text{similarity to drugs}\\
+                \text{made for other proteins}}} \,\big]$$
+
+    \vfill
+    \centering
+    \includegraphics[width=0.86\textwidth]{figs/talk/metric_tanimoto.pdf}
+    \vfill
+
+    \raggedright
+    Looks at structures rather than affinities.
+\end{frame}
+
+\begin{frame}[c]{State-of-the-art models are not selective}
+    \centering
+    \includegraphics[width=\textwidth,height=0.7\textheight,keepaspectratio]
+    {figs/talk/competitors_kiba.pdf}
+
+    \raggedright
+    DeepDTAGen: Nature Communications, 2025
+
+    Prot2Drug: Journal of Chemical Information and Modeling, 2025
+
+    ZeroGEN: Bioinformatics, 2025
+\end{frame}
+
+\section{Methods}
+
+\ours
+\begin{frame}[t]{Proteins define Gaussians}
+    $$p(z \mid p_i) = \mathcal{N}\!\left(m_\psi(p_i),\ I\right)$$
+
+    \vfill
+    \centering
+    \includegraphics[height=0.70\textheight]{figs/talk/protein_field.png}
+
+\end{frame}
+
+\ours
+\begin{frame}[t]{Drugs become Gaussians}
+    $$q(z \mid d) = \mathcal{N}\!\left(\mu_d,\ \mathrm{diag}(\sigma_d^2)\right)$$
+
+    \vfill
+    \centering
+    \includegraphics[height=0.7\textheight]{figs/chapters/methods.pdf}
+
+\end{frame}
+
+\ours
+\begin{frame}[t]{Shared latent space}
+    A drug is compatible with a protein if it has high likelihood under its distribution, and vice-versa.
+
+    $$s(d, p) = -\tfrac{1}{2}\left\|\mu_d - m_\psi(p)\right\|_2^{2}$$
+
+    \centering
+    \includegraphics[height=0.5\textheight]{figs/talk/same_map.png}
+
+    \raggedright
+    \vspace{-0.75cm}
+    \begin{align*}
+        \Longrightarrow \text{Organize the geometry so that } &
+        \text{\textbf{compatible} pairs are \textbf{close} and}\\
+        &\text{\textbf{incompatible} pairs are \textbf{far} apart.}
+    \end{align*}
+    \vspace{-0.5cm}
+\end{frame}
+
+\ours
+\begin{frame}{Our model}
+
+    Selective Variational Auto-Encoder Generator (SelVAEGen)
+    \vfill
+    {
+        \centering
+        \makebox[\textwidth][c]{%
+            \includegraphics[width=1.15\textwidth]{figs/model/model.pdf}
+        }
+    }
+    \vfill
+
+    Drugs and proteins share a latent space in $\mathbb{R}^{128}$
+\end{frame}
+
+\ours
+\begin{frame}{SelVAEGen}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{figs/model/protein_encoder.pdf}
+    \end{figure}
+
+    ESM-C makes per-amino-acid embeddings in $\mathbb{R}^{L\times 1152}$
+
+    \vspace{0.2cm}
+
+    We aggregate and reduce to $m_\psi(p)\in\mathbb{R}^{128}$
+
+    \begin{tikzpicture}[remember picture,overlay]
+        \node at ([xshift=11.75cm,yshift=-3.65cm]current page.north west)
+        {$m_\psi(p)$};
+    \end{tikzpicture}
+\end{frame}
+
+\ours
+\begin{frame}{SelVAEGen}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{figs/model/drug_encoder.pdf}
+    \end{figure}
+
+    Fingerprints concatenated and projected to $\mathbb{R}^{256}$
+
+    \vspace{0.2cm}
+
+    SELFIES transformer in $\mathbb{R}^{L\times 256}$
+
+    \vspace{0.2cm}
+
+    The fusion block reads $\mu_d,\ \log\sigma_d \in \mathbb{R}^{128}$ off the
+    fingerprint position
+
+\end{frame}
+
+\ours
+\begin{frame}{SelVAEGen}
+    \begin{figure}[h]
+        \centering
+        \includegraphics[width=\textwidth]{figs/model/drug_decoder.pdf}
+    \end{figure}
+
+    $z$ and $p$ are read by cross-attention
+
+    \vspace{0.2cm}
+
+    The decoder is a causal auto-regressive transformer in $\mathbb{R}^{L\times 256}$
+
+    \vspace{0.2cm}
+
+    One distribution over the SELFIES alphabet per position
+\end{frame}
+
+\ours
+\begin{frame}[c]{New loss terms}
+    \begin{center}
+        Video time :)
+    \end{center}
+\end{frame}
+
+\ours
+\begin{frame}[c]{The full objective}
+    We add our new losses to the VAE objective.
+
+    \vspace{0.2cm}
+    \[
+    \begin{aligned}
+        \mathcal{L} &={} \beta_{\mathrm{recon.}}\mathcal{L}_{\mathrm{recon.}}
+        &&\text{reconstruct molecules}\\[0.7em]
+        &+ \beta_{\mathrm{KL}}\,\mathcal{L}_\mathrm{KL}
+        &&\text{regularization}\\[0.7em]
+        &+ \beta_a\mathcal{L}_{\mathrm{aff}}
+        &&\text{ranks two drugs relative to one protein}\\[0.7em]
+        &+\beta_s\mathcal{L}_{\mathrm{sel}} &&\text{ranks two proteins relative to one drug}
+    \end{aligned}
+    \]
+\end{frame}
+
+\section{Results}
+
+\begin{frame}[c]{The datasets}
+    We test our model on 4 benchmark datasets.
+    \bigskip
+
+    Results are replicated 5 times with different data splits.
+
+    \vfill
+
+    \centering
+    \renewcommand{\arraystretch}{1.8}
+    \resizebox{\textwidth}{!}{%
+        \begin{tabular}{lrrrrrr}
+            \toprule
+            \textbf{Dataset} & \textbf{Drugs} & \textbf{Proteins} & \textbf{Records} & \textbf{Density (\%)} & \textbf{Threshold} & \textbf{Positive (\%)} \\
+            \midrule
+            KIBA & 2,015 & 225 & 115,822 & 25.55 & 12.10 & 20.86 \\
+            Davis & 64 & 427 & 27,328 & 100.00 & 7.00 & 8.03 \\
+            BindingDB & 31,053 & 1,200 & 77,412 & 0.21 & 7.00 & 30.43 \\
+            Papyrus & 81,147 & 749 & 239,226 & 0.39 & 7.00 & 32.15 \\
+            \bottomrule
+        \end{tabular}}
+
+    \vfill
+\end{frame}
+
+\begin{frame}[c]{Our generated drugs are selective}
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.16\textwidth]{figs/e6/kiba/seq_deltas.pdf}%
+    }
+
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.16\textwidth]{figs/e6/kiba/seq_agreement.pdf}%
+    }
+\end{frame}
+
+\begin{frame}[c]{And the affinity is higher too}
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.10\textwidth]{figs/talk/quality_affinity.pdf}%
+    }
+\end{frame}
+
+\begin{frame}[c]{This is not at the cost of chemical quality}
+    \centering
+    \includegraphics[width=\textwidth,height=0.88\textheight,keepaspectratio]
+    {figs/talk/quality_chemistry.pdf}
+\end{frame}
+
+\begin{frame}[c]{We generate drugs with higher affinity}
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.10\textwidth]{figs/e7/kiba/affinity.pdf}%
+    }
+\end{frame}
+
+\begin{frame}[c]{Difference in $p_G$ and $q_G$}
+    In KIBA:
+
+    \vfill
+
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.16\textwidth]{figs/talk/side_by_side_kiba.pdf}%
+    }
+
+    \vfill
+\end{frame}
+
+\begin{frame}[c]{Difference in $p_G$ and $q_G$}
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.16\textwidth]{figs/talk/tail_zoom.pdf}%
+    }
+\end{frame}
+
+\begin{frame}[t]{Utility}
+    \begin{table}
+        \centering
+
+        \small
+        \begin{tabular}{clc}
+            \toprule
+            Dataset & Model
+            & Utility \\
+            \midrule
+
+            \multirow{4}{*}{KIBA} & SelVAEGen
+            & \textbf{0.1334 $\pm$ 0.0499} \\
+            & DeepDTAGen
+            & \textbf{0.0045 $\pm$ 0.0016} \\
+            & Prot2Drug
+            & \textbf{0.0165 $\pm$ 0.0017} \\
+            & ZeroGEN
+            & \textbf{0.0046 $\pm$ 0.0024} \\
+            \midrule
+
+            \multirow{4}{*}{Davis} & SelVAEGen
+            & \textbf{0.2013 $\pm$ 0.0375} \\
+            & DeepDTAGen
+            & -0.0002 $\pm$ 0.0004 \\
+            & Prot2Drug
+            & 0.0001 $\pm$ 0.0015 \\
+            & ZeroGEN
+            & 0.0012 $\pm$ 0.0011 \\
+            \midrule
+
+            \multirow{4}{*}{BindingDB} & SelVAEGen
+            & \textbf{0.0275 $\pm$ 0.0050} \\
+            & DeepDTAGen
+            & \textbf{0.0060 $\pm$ 0.0026} \\
+            & Prot2Drug
+            & -0.0001 $\pm$ 0.0086 \\
+            & ZeroGEN
+            & 0.0063 $\pm$ 0.0116 \\
+            \midrule
+
+            \multirow{4}{*}{Papyrus} & SelVAEGen
+            & \textbf{0.0373 $\pm$ 0.0222} \\
+            & DeepDTAGen
+            & -0.0023 $\pm$ 0.0019 \\
+            & Prot2Drug
+            & 0.0040 $\pm$ 0.0132 \\
+            & ZeroGEN
+            & -0.0004 $\pm$ 0.0057 \\
+
+            \bottomrule
+        \end{tabular}
+    \end{table}
+\end{frame}
+
+\begin{frame}[t]{Sparsity, not size}
+    \centering
+    \includegraphics[width=\textwidth]{figs/talk/density_not_size.pdf}
+
+    \vfill
+    \raggedright
+    Davis is the \textbf{smallest} dataset and the \textbf{most dense}.
+
+    Papyrus is the \textbf{largest} dataset but the second \textbf{most sparse}.
+
+    \vspace{0.3cm}
+
+    \textcolor{red}{$\mathcal{L}_{\mathrm{sel}}$ needs the same drug measured against two
+        proteins.}
+\end{frame}
+
+\section{Conclusion}
+\begin{frame}{Conclusion}
+    \begin{itemize}
+        \item We uniformize a notion that is spread throughout the literature
+        \item We formalize it into a well-defined ML task
+        \item We define additional metrics to identify selectivity
+        \item We show that current models' generation is not selective
+        \item We derive loss functions that promote it
+        \item We introduce a model capable of selective drug generation
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Limitations and future work}
+    \begin{itemize}
+        \item \textbf{Predicted (not measured) selectivity.}
+
+        So far, we rely on oracle predictions.
+
+        \medskip
+        $\Longrightarrow$ Validate with docking experiments.
+
+        \vfill
+
+        \medskip
+        \item \textbf{Whole-protein conditioning.}
+
+        We currently condition on the entire protein sequence.
+
+        \medskip
+        $\Longrightarrow$ Extend to specific binding pockets or interfaces.
+    \end{itemize}
+\end{frame}
+
+\section*{Thanks}
+\begin{frame}[plain, c]
+    \begin{center}
+        \Huge
+        Thank you!
+
+        \vspace{1cm}
+
+        \normalsize
+        Questions?
+    \end{center}
+\end{frame}
+
+\input{backup_slides}
+
+\end{document}
